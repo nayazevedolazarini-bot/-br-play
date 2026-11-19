@@ -118,11 +118,31 @@ function openDetail(id){
  document.getElementById("detail").style.display="flex";
 }
 function playCurrent(){
- if(!current||!current.video)return;
- const box=document.getElementById("playerbox"),url=current.video;
- if(/\.mp4($|\?)/i.test(url)){box.innerHTML="";const v=document.createElement("video");v.src=url;v.controls=true;v.autoplay=true;v.playsInline=true;box.appendChild(v)}
- else if(/youtube\.com\/embed\/|player\.vimeo\.com\/video\//i.test(url)){box.innerHTML="";const f=document.createElement("iframe");f.src=url;f.allow="autoplay; encrypted-media; picture-in-picture";f.allowFullscreen=true;box.appendChild(f)}
- else {window.open(url,"_blank","noopener");}
+  if(!current || !current.video) return;
+
+  const box=document.getElementById("playerbox");
+  const url=current.video.trim();
+
+  const match=url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
+  );
+
+  if(/\.mp4($|\?)/i.test(url)){
+    box.innerHTML=`<video controls autoplay playsinline
+    style="width:100%;height:100%">
+    <source src="${url}" type="video/mp4">
+    </video>`;
+  }
+  else if(match){
+    box.innerHTML=`<iframe
+    src="https://www.youtube.com/embed/${match[1]}?autoplay=1"
+    style="width:100%;height:100%;border:0"
+    allow="autoplay; encrypted-media; fullscreen"
+    allowfullscreen></iframe>`;
+  }
+  else {
+    window.open(url,"_blank");
+  }
 }
 function openAdd(){document.getElementById("add").style.display="flex"}
 function closeModal(id){document.getElementById(id).style.display="none"}
