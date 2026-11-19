@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101018">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>BR Play — Filmes, Séries e Doramas</title>
+<style>
+:root{--bg:#090910;--panel:#191923;--panel2:#222230;--muted:#aaaabd;--pink:#ff477e;--purple:#8b5cf6;--line:#343443}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px system-ui,Arial,sans-serif}
+header{padding:18px 5vw 22px;background:linear-gradient(120deg,#351044,#17172b 65%,#3b1730)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.brand{font-size:27px;font-weight:950;letter-spacing:.5px}.brand span{color:#ff5790}
+.tag{color:#e7ddeb;font-size:13px}.search{display:flex;gap:8px;margin-top:18px;max-width:650px}
+input,select{width:100%;padding:12px 14px;border:1px solid #444052;border-radius:11px;background:#11111b;color:white;font-size:15px}
+nav{display:flex;gap:9px;padding:13px 5vw;overflow:auto;background:#151520;position:sticky;top:0;z-index:3}
+nav button,.chip{white-space:nowrap;border:1px solid #464256;background:#242432;color:#fff;padding:9px 14px;border-radius:22px;cursor:pointer}
+nav button.active{background:var(--pink);border-color:var(--pink)}
+main{padding:22px 5vw 55px}.hero{border-radius:18px;padding:25px;background:linear-gradient(100deg,#5c1b54,#241c48);margin-bottom:24px;min-height:180px;display:flex;align-items:center}
+.hero h1{font-size:clamp(25px,5vw,40px);margin:0 0 8px}.hero p{color:#eee;max-width:620px;line-height:1.5}
+.note{background:#1b1b27;border-left:3px solid var(--purple);padding:13px;border-radius:8px;color:#d8d6e5;line-height:1.5;margin:16px 0}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h2{font-size:21px;margin:25px 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:15px}
+.card{background:var(--panel);border-radius:14px;overflow:hidden;border:1px solid #303040;transition:.18s}
+.card:hover{transform:translateY(-3px);border-color:#75517d}
+.poster{height:205px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;font-size:48px;background:linear-gradient(145deg,#42224e,#202e4a);background-size:cover;background-position:center;position:relative}
+.poster:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#090910aa)}
+.poster small{z-index:1;font-size:12px;color:#fff;margin-top:8px}
+.info{padding:12px}.info b{display:block;margin-bottom:5px}.info small{color:var(--muted)}
+.actions{display:flex;gap:7px;margin-top:10px}.actions button,button.primary,button.secondary{padding:9px 10px;border:0;border-radius:8px;background:#393449;color:white;cursor:pointer}
+.actions button{flex:1}.actions button:first-child,button.primary{background:#d93670}
+button.secondary{background:#393449}button:focus,input:focus{outline:2px solid #ff79a2;outline-offset:2px}
+.empty{color:var(--muted);padding:20px 0}
+footer{padding:25px 5vw;color:var(--muted);background:#151520;font-size:13px;line-height:1.6}
+.overlay{display:none;position:fixed;inset:0;background:#000d;z-index:10;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.modal{max-width:720px;width:100%;max-height:92vh;overflow:auto;background:#1b1b27;border:1px solid #444052;border-radius:16px;padding:20px}
+.modalhead{display:flex;justify-content:space-between;gap:10px;align-items:center}.modal h2{margin:5px 0 14px}
+.close{background:#393449;color:#fff;border:0;border-radius:9px;padding:8px 12px;cursor:pointer}
+.playerbox{background:#050508;border-radius:12px;min-height:190px;display:grid;place-items:center;margin:14px 0;overflow:hidden}
+.playerbox iframe,.playerbox video{width:100%;aspect-ratio:16/9;border:0}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formgrid .full{grid-column:1/-1}
+.smallmuted{color:var(--muted);font-size:13px}
+@media(min-width:800px){.poster{height:245px}}
+@media(max-width:520px){.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}.hero{padding:20px}.poster{height:190px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><div><div class="brand">BR <span>PLAY</span> 🎬</div><div class="tag">Seu espaço para filmes, séries, comédias e doramas</div></div><button class="secondary" onclick="openAdd()">＋ Adicionar título</button></div>
+ <div class="search"><input id="search" placeholder="Buscar filme, série ou dorama..." aria-label="Buscar títulos"></div>
+</header>
+<nav id="tabs">
+ <button class="active" data-cat="Todos">Início</button><button data-cat="Dorama">Doramas</button><button data-cat="Comédia">Comédia</button><button data-cat="Filme">Filmes</button><button data-cat="Série">Séries</button><button data-cat="Favoritos">❤️ Favoritos</button>
+</nav>
+<main>
+ <section class="hero"><div><span class="chip">BR PLAY ORIGINAL</span><h1>Histórias para maratonar.</h1><p>Encontre seu próximo favorito. Pesquise o catálogo, salve títulos e adicione seus próprios vídeos autorizados.</p></div></section>
+ <div class="note">Este é um catálogo demonstrativo: os títulos de exemplo não incluem episódios ou filmes. Adicione apenas vídeos próprios, de domínio público ou com autorização/licença para exibição e distribuição.</div>
+ <div class="sectionhead"><h2 id="heading">Destaques</h2><span class="smallmuted" id="count"></span></div>
+ <section class="grid" id="grid"></section>
+</main>
+<footer>BR Play • Protótipo em HTML. Os dados adicionados ficam salvos neste navegador. Antes de publicar o aplicativo ou disponibilizar vídeos, confirme os direitos de exibição, download, dublagem e monetização de cada conteúdo.</footer>
+
+<div class="overlay" id="detail" onclick="outsideClose(event,'detail')"><div class="modal">
+ <div class="modalhead"><div class="smallmuted">BR PLAY • DETALHES</div><button class="close" onclick="closeModal('detail')">Fechar ✕</button></div>
+ <h2 id="detailTitle">Título</h2><div class="smallmuted" id="detailMeta"></div><p id="detailDesc"></p>
+ <div class="playerbox" id="playerbox">Selecione um título com vídeo cadastrado para assistir.</div>
+ <button class="primary" id="playBtn" onclick="playCurrent()">▶ Assistir agora</button>
+</div></div>
+
+<div class="overlay" id="add" onclick="outsideClose(event,'add')"><div class="modal">
+ <div class="modalhead"><div><h2>Adicionar ao catálogo</h2><div class="smallmuted">Cadastre um conteúdo que você tem direito de exibir.</div></div><button class="close" onclick="closeModal('add')">Fechar ✕</button></div>
+ <form id="addForm" class="formgrid">
+  <input class="full" id="newTitle" placeholder="Nome do filme ou série" required maxlength="90">
+  <select id="newCat"><option>Dorama</option><option>Comédia</option><option>Filme</option><option>Série</option></select>
+  <input id="newGenre" placeholder="Gênero / descrição">
+  <input class="full" id="newPoster" type="url" placeholder="Link de imagem da capa (opcional)">
+  <input class="full" id="newVideo" type="url" placeholder="Link direto MP4 ou link incorporável (opcional)">
+  <label class="full smallmuted"><input id="rights" type="checkbox" required style="width:auto"> Confirmo que tenho autorização ou licença para exibir este conteúdo.</label>
+  <button class="primary full" type="submit">Salvar título</button>
+ </form>
+ <p class="smallmuted">Dica: links de páginas comuns de streaming podem não funcionar como vídeo incorporado. Use um link direto/permitido pelo provedor.</p>
+</div></div>
+
+<script>
+const starter=[
+ {id:1,title:"Meu Amor de Outra Estrela",cat:"Dorama",desc:"Romance • Coreia do Sul",emoji:"💜"},
+ {id:2,title:"Pousando no Amor",cat:"Dorama",desc:"Romance • Comédia",emoji:"🌸"},
+ {id:3,title:"Risadas em Família",cat:"Comédia",desc:"Comédia • Exemplo de catálogo",emoji:"😂"},
+ {id:4,title:"Aventura no Fim de Semana",cat:"Filme",desc:"Aventura • Exemplo de catálogo",emoji:"🗺️"},
+ {id:5,title:"Amigos para Sempre",cat:"Série",desc:"Comédia • Exemplo de catálogo",emoji:"🍿"},
+ {id:6,title:"O Chefe Apaixonado",cat:"Dorama",desc:"Romance • Comédia",emoji:"💗"},
+ {id:7,title:"Confusão no Condomínio",cat:"Comédia",desc:"Comédia • Exemplo de catálogo",emoji:"🤣"},
+ {id:8,title:"Missão Impossível? Não!",cat:"Filme",desc:"Ação • Comédia • Exemplo",emoji:"🎬"}
+];
+let items=loadItems(),category="Todos",favorites=JSON.parse(localStorage.getItem("brplay-favs")||"[]"),current=null;
+function loadItems(){try{return JSON.parse(localStorage.getItem("brplay-items"))||starter}catch(e){return starter}}
+function saveItems(){localStorage.setItem("brplay-items",JSON.stringify(items))}
+const grid=document.getElementById("grid"),search=document.getElementById("search");
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){
+ const q=search.value.toLowerCase().trim();
+ const list=items.filter(x=>(category==="Todos"||x.cat===category||(category==="Favoritos"&&favorites.includes(x.id)))&&(x.title.toLowerCase().includes(q)||x.cat.toLowerCase().includes(q)||(x.desc||"").toLowerCase().includes(q)));
+ document.getElementById("heading").textContent=category==="Todos"?"Destaques":category;
+ document.getElementById("count").textContent=list.length+" título(s)";
+ grid.innerHTML=list.length?list.map(x=>`<article class="card"><div class="poster" style="${x.poster?'background-image:linear-gradient(#0002,#0005),url('+esc(x.poster)+')':''}">${x.poster?'':(x.emoji||"🎬")}<small>${esc(x.cat)}</small></div><div class="info"><b>${esc(x.title)}</b><small>${esc(x.desc||"Adicionado ao catálogo")}</small><div class="actions"><button onclick="openDetail(${Number(x.id)})">▶ Ver</button><button aria-label="Favoritar" onclick="toggleFav(${Number(x.id)})">${favorites.includes(x.id)?"♥":"♡"}</button></div></div></article>`).join(""):'<p class="empty">Nenhum título encontrado. Tente outra busca ou categoria.</p>';
+}
+function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(v=>v!==id):[...favorites,id];localStorage.setItem("brplay-favs",JSON.stringify(favorites));render()}
+function openDetail(id){
+ current=items.find(v=>v.id===id);if(!current)return;
+ document.getElementById("detailTitle").textContent=current.title;
+ document.getElementById("detailMeta").textContent=current.cat+" • "+(current.desc||"");
+ document.getElementById("detailDesc").textContent=current.video?"Vídeo cadastrado. Pressione Assistir agora para reproduzir.":"Este título ainda não tem vídeo cadastrado.";
+ document.getElementById("playerbox").innerHTML="Selecione “Assistir agora” para abrir o vídeo, se houver um link compatível.";
+ document.getElementById("playBtn").disabled=!current.video;
+ document.getElementById("playBtn").style.opacity=current.video?"1":".5";
+ document.getElementById("detail").style.display="flex";
+}
+function playCurrent(){
+ if(!current||!current.video)return;
+ const box=document.getElementById("playerbox"),url=current.video;
+ if(/\.mp4($|\?)/i.test(url)){box.innerHTML="";const v=document.createElement("video");v.src=url;v.controls=true;v.autoplay=true;v.playsInline=true;box.appendChild(v)}
+ else if(/youtube\.com\/embed\/|player\.vimeo\.com\/video\//i.test(url)){box.innerHTML="";const f=document.createElement("iframe");f.src=url;f.allow="autoplay; encrypted-media; picture-in-picture";f.allowFullscreen=true;box.appendChild(f)}
+ else {window.open(url,"_blank","noopener");}
+}
+function openAdd(){document.getElementById("add").style.display="flex"}
+function closeModal(id){document.getElementById(id).style.display="none"}
+function outsideClose(e,id){if(e.target.id===id)closeModal(id)}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");category=b.dataset.cat;render()}));
+search.addEventListener("input",render);
+document.getElementById("addForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const item={id:Date.now(),title:document.getElementById("newTitle").value.trim(),cat:document.getElementById("newCat").value,desc:document.getElementById("newGenre").value.trim()||"Adicionado ao catálogo",poster:document.getElementById("newPoster").value.trim(),video:document.getElementById("newVideo").value.trim(),emoji:"🎬"};
+ items.unshift(item);saveItems();category="Todos";document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.cat==="Todos"));e.target.reset();closeModal("add");render();
+});
+render();
+</script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(console.error)); }</script>
+</body>
+</html>

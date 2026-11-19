@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101018">
+<title>BR Play — Filmes & Doramas</title>
+<style>
+:root{--bg:#101018;--panel:#1b1b27;--muted:#aaaabd;--pink:#ff477e;--purple:#8b5cf6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px system-ui,Arial}
+header{padding:22px 5vw 18px;background:linear-gradient(120deg,#321044,#17172b 65%,#3b1730)}
+.brand{font-size:25px;font-weight:900;letter-spacing:.5px}.brand span{color:#ff5790}
+header p{color:#ddd;margin:5px 0 18px}.search{display:flex;gap:8px;max-width:600px}
+input{width:100%;padding:13px 15px;border:1px solid #444052;border-radius:12px;background:#11111b;color:white;font-size:15px}
+nav{display:flex;gap:9px;padding:14px 5vw;overflow:auto;background:#151520;position:sticky;top:0;z-index:2}
+nav button,.chip{white-space:nowrap;border:1px solid #464256;background:#242432;color:#fff;padding:9px 14px;border-radius:22px}
+nav button.active{background:var(--pink);border-color:var(--pink)}
+main{padding:22px 5vw 50px}.hero{border-radius:18px;padding:25px;background:linear-gradient(100deg,#5c1b54,#241c48);margin-bottom:28px}
+.hero h1{font-size:clamp(24px,5vw,38px);margin:0 0 8px}.hero p{color:#eee;max-width:620px}
+h2{font-size:21px;margin:25px 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:15px}
+.card{background:var(--panel);border-radius:14px;overflow:hidden;border:1px solid #303040}
+.poster{height:190px;display:grid;place-items:center;text-align:center;padding:15px;font-size:35px;background:linear-gradient(145deg,#42224e,#202e4a)}
+.poster small{display:block;font-size:12px;color:#ddd;margin-top:8px}.info{padding:12px}.info b{display:block;margin-bottom:5px}.info small{color:var(--muted)}
+.actions{display:flex;gap:7px;margin-top:10px}.actions button{flex:1;padding:8px 5px;border:0;border-radius:8px;background:#393449;color:white}.actions button:first-child{background:#d93670}
+.note{background:#1b1b27;border-left:3px solid var(--purple);padding:13px;border-radius:8px;color:#d8d6e5;line-height:1.5}
+footer{padding:25px 5vw;color:var(--muted);background:#151520;font-size:13px}
+#player{display:none;position:fixed;inset:0;background:#000d;z-index:5;align-items:center;justify-content:center;padding:18px}
+.modal{max-width:650px;width:100%;background:#1b1b27;border-radius:16px;padding:20px}.modal button{padding:10px 15px;border:0;border-radius:9px;background:var(--pink);color:white}
+@media(min-width:800px){.poster{height:235px}}
+</style></head>
+<body>
+<header><div class="brand">BR <span>PLAY</span> 🎬</div><p>Filmes, séries, comédias e doramas em um só lugar</p>
+<div class="search"><input id="search" placeholder="Buscar filme, série ou dorama..." aria-label="Buscar títulos"></div></header>
+<nav id="tabs"><button class="active" data-cat="Todos">Início</button><button data-cat="Dorama">Doramas</button><button data-cat="Comédia">Comédia</button><button data-cat="Filme">Filmes</button><button data-cat="Série">Séries</button><button data-cat="Favoritos">❤️ Favoritos</button></nav>
+<main><section class="hero"><h1>Seu próximo favorito está aqui.</h1><p>Explore histórias coreanas, risadas e aventuras. Use a busca ou escolha uma categoria.</p><span class="chip">Catálogo demonstrativo</span></section>
+<div class="note">Este aplicativo é um catálogo inicial. Os títulos de demonstração não incluem vídeos protegidos. Adicione somente vídeos próprios, de domínio público ou com licença/autorização para exibição.</div>
+<h2 id="heading">Destaques</h2><section class="grid" id="grid"></section>
+</main><footer>BR Play • Protótipo demonstrativo. Antes de publicar, confira os direitos de exibição, download, dublagem e monetização de cada conteúdo.</footer>
+<div id="player"><div class="modal"><h2 id="ptitle">Assistir</h2><p id="pdesc">Adicione um link de vídeo autorizado para reproduzir aqui.</p><button onclick="closePlayer()">Fechar</button></div></div>
+<script>
+const items=[
+ {id:1,title:"Meu Amor de Outra Estrela",cat:"Dorama",desc:"Romance • Coreia do Sul",emoji:"💜"},
+ {id:2,title:"Pousando no Amor",cat:"Dorama",desc:"Romance • Comédia",emoji:"🌸"},
+ {id:3,title:"Risadas em Família",cat:"Comédia",desc:"Comédia • Exemplo de catálogo",emoji:"😂"},
+ {id:4,title:"Aventura no Fim de Semana",cat:"Filme",desc:"Aventura • Exemplo de catálogo",emoji:"🗺️"},
+ {id:5,title:"Amigos para Sempre",cat:"Série",desc:"Comédia • Exemplo de catálogo",emoji:"🍿"},
+ {id:6,title:"O Chefe Apaixonado",cat:"Dorama",desc:"Romance • Comédia",emoji:"💗"},
+ {id:7,title:"Confusão no Condomínio",cat:"Comédia",desc:"Comédia • Exemplo de catálogo",emoji:"🤣"},
+ {id:8,title:"Missão Impossível? Não!",cat:"Filme",desc:"Ação • Comédia • Exemplo",emoji:"🎬"}
+];
+let category="Todos",favorites=JSON.parse(localStorage.getItem("brplay-favs")||"[]");
+const grid=document.getElementById("grid"),search=document.getElementById("search");
+function render(){let q=search.value.toLowerCase();let list=items.filter(x=>(category==="Todos"||x.cat===category||(category==="Favoritos"&&favorites.includes(x.id)))&&(x.title.toLowerCase().includes(q)||x.cat.toLowerCase().includes(q)));
+document.getElementById("heading").textContent=category==="Todos"?"Destaques":category;
+grid.innerHTML=list.length?list.map(x=>`<article class="card"><div class="poster">${x.emoji}<small>${x.cat}</small></div><div class="info"><b>${x.title}</b><small>${x.desc}</small><div class="actions"><button onclick="openPlayer(${x.id})">▶ Ver</button><button onclick="toggleFav(${x.id})">${favorites.includes(x.id)?"♥":"♡"}</button></div></div></article>`).join(""):'<p>Nenhum título encontrado.</p>'}
+function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(v=>v!==id):[...favorites,id];localStorage.setItem("brplay-favs",JSON.stringify(favorites));render()}
+function openPlayer(id){let x=items.find(v=>v.id===id);document.getElementById("ptitle").textContent=x.title;document.getElementById("pdesc").textContent="Este é um item de demonstração. Para assistir, cadastre um link de vídeo próprio ou autorizado.";document.getElementById("player").style.display="flex"}
+function closePlayer(){document.getElementById("player").style.display="none"}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");category=b.dataset.cat;render()}));
+search.addEventListener("input",render);render();
+</script></body></html>
